@@ -1,0 +1,350 @@
+<template>
+   <header class="header-banner">
+    <h1>Sharpen The Saw</h1>
+
+    <div class="status-left">
+    <div id="wsBadge" class="badge">{{ loggedInn.weedstones }} WS</div>
+  </div>
+
+       <div class="status-right">
+    <img id="sharpIcon" class="sharp-icon" src="./assets/saw_dull.png" alt="Blade sharpness">
+    <div id="sharpMeter" class="sharp-meter" aria-label="Saw sharpness">
+      <span id="sharpLabel" class="label">Dull</span>
+      <div class="segments">
+        <i class="seg" data-th="1"></i>
+        <i class="seg" data-th="2"></i>
+        <i class="seg" data-th="3"></i>
+      </div>
+    </div>
+    <div id="pointsBadge" class="points-badge">{{ loggedInn.lifePoints }} LP</div>  
+  </div>
+</header>
+
+      <nav class="controls">
+    <router-link to="/target"><button>Target</button></router-link>
+     <router-link to="/blacksmith"><button>Visit Blacksmith</button></router-link>
+      <router-link to="/needsomeboost"><button>Need Some Boost!</button></router-link>
+      <router-link to="/edittarget"><button>Edit Targets</button></router-link>
+      <router-link to="/users">Users</router-link>
+      <router-link to="/login" v-if="loggedInn.name == '' && loggedInn.id == ''"><button>Log inn</button></router-link>
+      <button v-else v-on:click="logout">Log out</button>
+      
+  </nav>
+
+   
+    <div id="Main">
+      <div v-if="loggedInn.id !== '' || this.$route.name == 'login'">
+      <router-view/>
+      </div>
+      <div v-else class="loginbtn">
+         <router-link to="/login"><button style="height: 200px; width: 300px; font-size: xx-large; margin-top: 100px;">Log inn</button></router-link>
+      </div>
+    </div>
+
+    <footer>Help</footer>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+    data() {
+          return {
+          };
+      },
+         computed: {
+        ...mapState(['loggedInn'])
+      },
+      created () {
+      },
+      methods: {
+        logout() {
+                this.$store.commit('setLoggedOut')
+                console.log(this.loggedInn)
+                
+        }
+      }
+    }  
+</script>
+
+<style>
+/* =========================================
+   THEME TOKENS
+========================================= */
+:root {
+  --bg-1: #0b0f1a;
+  --bg-2: #131a2b;
+  --fg: #e6eaf2;
+  --dim: #9aa3b2;
+  --accent: #6ee7ff;
+  --accent-2: #9cff6e;
+  --card: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.12);
+  --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  --radius: 18px;
+}
+
+/* =========================================
+   BASE
+========================================= */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background:
+    radial-gradient(1200px 600px at 80% -20%, #1e2a55 0%, transparent 60%),
+    radial-gradient(1000px 600px at -10% 110%, #114b5f 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+}
+
+/* =========================================
+   HEADER
+========================================= */
+.header-banner {
+  position: relative;
+  padding: 28px 22px 8px;
+  text-align: center;
+}
+.header-banner h1 {
+  margin: 0;
+  font-size: clamp(26px, 3.2vw, 42px);
+  letter-spacing: 0.5px;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 2px 18px rgba(110,231,255,0.15);
+}
+
+/* Left (WS) + Right (icon + LP) header status */
+.status-left  { position:absolute; left:22px;  top:22px; display:flex; align-items:center; gap:10px; }
+.status-right { position:absolute; right:22px; top:22px; display:flex; align-items:center; gap:10px; }
+
+/* Reusable badges */
+.badge, .points-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-weight: 800;
+  letter-spacing: .3px;
+  box-shadow: var(--shadow);
+}
+
+/* Sharpness icon */
+.sharp-icon{
+  width: 40px; height: 40px;        /* tweak size if you want */
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
+  user-select: none;
+  pointer-events: none;
+}
+.sharp-icon.very-sharp { transform: rotate(-8deg) scale(1.05); transition: transform .2s ease; }
+
+/* =========================================
+   SHARPNESS HUD (label + segments)
+========================================= */
+.sharp-meter{
+  display:flex; align-items:center; gap:8px;
+  padding:6px 8px; border-radius:999px;
+  border:1px solid var(--border); background:var(--card);
+  box-shadow: var(--shadow);
+}
+.sharp-meter .label{ font-size:12px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; }
+.sharp-meter .segments{ display:flex; gap:6px; align-items:center; }
+.sharp-meter .seg{
+  width:12px; height:12px; border-radius:3px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
+  transition: transform .15s ease, background .2s ease, border-color .2s ease;
+}
+.sharp-meter .seg.active{
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-color: rgba(255,255,255,.55);
+  transform: translateY(-1px) scale(1.05);
+}
+
+/* Achievement toast + celebration pulse */
+.achieve-toast{
+  position: fixed; z-index: 9999;
+  left: 50%; top: 16px; transform: translateX(-50%);
+  padding:10px 14px; border-radius: 12px;
+  color:#0b0f1a; font-weight:800; letter-spacing:.3px;
+  background: linear-gradient(90deg, #9cff6e, #6ee7ff);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  animation: toast-pop .9s ease, toast-fade 3s 1.2s ease forwards;
+  pointer-events:none;
+}
+@keyframes toast-pop { 0%{transform:translateX(-50%) scale(.9); opacity:0} 50%{transform:translateX(-50%) scale(1.03); opacity:1} 100%{transform:translateX(-50%) scale(1)} }
+@keyframes toast-fade { to{opacity:0; transform:translateX(-50%) translateY(-8px)} }
+.celebrate { animation: celebrate-pulse .9s ease; }
+@keyframes celebrate-pulse { 0%{ transform: scale(1); filter: drop-shadow(0 0 0 rgba(156,255,110,0)); } 40%{ transform: scale(1.08) rotate(-2deg); filter: drop-shadow(0 0 12px rgba(156,255,110,.55)); } 100%{ transform: scale(1); filter: drop-shadow(0 0 0 rgba(156,255,110,0)); } }
+
+/* =========================================
+   CONTROLS (nav buttons row)
+========================================= */
+.controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 10px 16px 22px;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   SHARED VIEW CONTAINER
+========================================= */
+#Main {
+  width: min(900px, 92vw);
+  min-height: 500px;             /* use min-height so content can grow */
+  margin: 24px auto;             /* centers horizontally */
+  padding: 26px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  background:    
+    radial-gradient(1200px 600px at 0% -20%, #1e2a55 0%, transparent 60%),
+    radial-gradient(1000px 600px at 110% 130%, #114b5f 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+}
+
+/* Soft readability overlay for busy backgrounds */
+#Main::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.12));
+  pointer-events: none;
+}
+
+/* Typography inside container */
+#Main h2 { margin: 0 0 12px; font-size: clamp(18px, 2.2vw, 24px); }
+#Main p  { margin: 0; color: var(--dim); line-height: 1.6; }
+
+/* =========================================
+   BUTTONS
+========================================= */
+button, .btn {
+  --btn-bg: var(--card);
+  --btn-br: var(--border);
+  padding: 10px 16px;
+  border-radius: calc(var(--radius) - 6px);
+  border: 1px solid var(--btn-br);
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+button:hover, .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.25); }
+button:active, .btn:active { transform: translateY(0); }
+button:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:disabled, .btn:disabled { opacity: .6; cursor: not-allowed; }
+.is-done { opacity: .7; }
+.target-btn {gap: 12px;}
+
+/* Completed target button state */
+.target-btn.is-done {
+  background: linear-gradient(180deg, rgba(156,255,110,.25), rgba(255,255,255,.08));
+  border-color: rgba(156,255,110,.5);
+  opacity: 1;
+}
+
+/* =========================================
+   BLACKSMITH METER
+========================================= */
+.meter {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+}
+.meter > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+/* =========================================
+   FOOTER (OPTIONAL)
+========================================= */
+footer { text-align: center; padding: 16px; color: var(--dim); font-size: 12px; }
+
+/* =========================================
+   PER-VIEW BACKGROUNDS (via #app[data-view="..."])
+   JS: document.getElementById('app').setAttribute('data-view', model.app.currentPage)
+========================================= */
+#Main[data-view="default"] {
+  --view-bg: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+}
+#Main[data-view="target"] {
+  --view-bg:
+    radial-gradient(800px 400px at 20% -10%, rgba(110,231,255,.18), transparent 60%),
+    radial-gradient(700px 380px at 110% 120%, rgba(156,255,110,.18), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+}
+#Main[data-view="boostme"] {
+  --view-bg:
+    radial-gradient(780px 380px at 0% 100%, rgba(142,97,255,.22), transparent 60%),
+    radial-gradient(700px 360px at 120% -10%, rgba(94,234,212,.16), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+}
+#Main[data-view="nextActivites"] {
+  --view-bg:
+    radial-gradient(820px 420px at 100% 0%, rgba(110,231,255,.18), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+}
+
+/* =========================================
+   BLACKSMITH VIEW — HERO IMAGE ABOVE CONTENT
+========================================= */
+#app[data-view="blacksmith"]{
+  --view-bg: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  position: relative; /* stacking context for ::before and content */
+}
+
+/* Put the image as a hero banner inside the card, above content flow */
+#app[data-view="blacksmith"]::before{
+  content:"";
+  display:block;
+  height: clamp(180px, 35vw, 360px);          /* hero size */
+  background: url('./assets/blacksmith.png') center no-repeat;
+  background-size: contain;                    /* show full image */
+  margin: -26px -22px 16px;                    /* bleed to card edges (matches #app padding) */
+  border-radius: calc(var(--radius) - 6px);
+  box-shadow: inset 0 -60px 80px rgba(0,0,0,.25); /* subtle bottom fade */
+  position: relative;
+  z-index: 0;                                  /* under content */
+}
+
+/* Don’t dim the whole card for this view */
+#app[data-view="blacksmith"]::after{ background: none; }
+
+/* Ensure blacksmith content (button + meter) is on top */
+#app[data-view="blacksmith"] .blacksmith-container { position: relative; z-index: 1; }
+
+
+.center {
+  text-align: center;
+}
+
+
+.form {
+      display: grid;
+      justify-content: center;
+      align-items: center;       
+}
+
+.loginbtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+}
+
+</style>
